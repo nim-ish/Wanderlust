@@ -28,12 +28,12 @@ class HomeScreen extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: Icon(Icons.menu),
+            icon: Icon(Icons.person),
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => ProfileScreen()),
-             // );
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginRegistrationScreen()),
+              );
             },
           ),
         ],
@@ -56,7 +56,7 @@ class HomeScreen extends StatelessWidget {
           children: <Widget>[
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: Colors.blueGrey,
               ),
               child: Text(
                 'Wanderlust',

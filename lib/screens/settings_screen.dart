@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wanderlust/constants.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -8,54 +9,49 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-  bool _darkModeEnabled = false;
+  bool isDarkMode = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Settings'),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(height: 20),
-          SwitchListTile(
-            title: Text('Enable Notifications'),
-            value: _notificationsEnabled,
-            onChanged: (value) {
-              setState(() {
-                _notificationsEnabled = value;
-              });
-            },
-          ),
-          SizedBox(height: 20),
-          SwitchListTile(
-            title: Text('Enable Dark Mode'),
-            value: _darkModeEnabled,
-            onChanged: (value) {
-              setState(() {
-                _darkModeEnabled = value;
-              });
-            },
-          ),
-          SizedBox(height: 20),
-          ListTile(
-            title: Text('Language'),
-            trailing: DropdownButton<String>(
-              value: 'English',
-              onChanged: (value) {},
-              items: <String>['English', 'French']
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: kDefaultPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: kDefaultPadding),
+            Text(
+              'Appearance',
+              style: Theme.of(context).textTheme.headline6,
             ),
-          ),
-        ],
+            SwitchListTile(
+              title: const Text('Dark Mode'),
+              value: isDarkMode,
+              onChanged: (value) {
+                setState(() {
+                  isDarkMode = value;
+                  final Brightness newBrightness =
+                  isDarkMode ? Brightness.dark : Brightness.light;
+                  final ThemeData newTheme =
+                  ThemeData.from(colorScheme: ThemeData().colorScheme.copyWith(brightness: newBrightness));
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Theme(
+                        data: newTheme,
+                        child: const SettingsScreen(),
+                      ),
+                    ),
+                  );
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
