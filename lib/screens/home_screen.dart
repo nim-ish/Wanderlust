@@ -21,10 +21,10 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.search),
             onPressed: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (context) => SearchScreen()),
-              //);
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SearchResultsScreen()),
+              );
             },
           ),
           IconButton(
@@ -39,14 +39,42 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Text('Welcome to Wanderlust!'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Welcome to Wanderlust!'),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => TravelPlannerScreen()),
+                );
+              },
+              child: Text('Go to Travel Planner'),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(builder: (context) => TravelPlannerScreen()),
-          //);
+          // Add animation for the floating action button here
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Add New Trip'),
+                content: Text('This feature is coming soon!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
         },
         child: Icon(Icons.add),
       ),
@@ -70,17 +98,17 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.home),
               title: Text('Home'),
               onTap: () {
-                // Navigator.pop(context);
+                Navigator.pop(context);
               },
             ),
             ListTile(
               leading: Icon(Icons.info),
               title: Text('About'),
               onTap: () {
-                 Navigator.push(
-                   context,
-                   MaterialPageRoute(builder: (context) => AboutScreen()),
-                 );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutScreen()),
+                );
               },
             ),
             ListTile(
@@ -88,8 +116,8 @@ class HomeScreen extends StatelessWidget {
               title: Text('My Trips'),
               onTap: () {
                 // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => MyTripsScreen()),
+                // context,
+                // MaterialPageRoute(builder: (context) => MyTripsScreen()),
                 // );
               },
             ),
@@ -97,20 +125,20 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.person),
               title: Text('Profile'),
               onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => ProfileScreen()),
-                // );
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
               },
             ),
             ListTile(
               leading: Icon(Icons.settings),
               title: Text('Settings'),
               onTap: () {
-                 Navigator.push(
-                   context,
-                   MaterialPageRoute(builder: (context) => SettingsScreen()),
-                 );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsScreen()),
+                );
               },
             ),
             ListTile(
