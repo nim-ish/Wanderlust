@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginRegistrationScreen extends StatelessWidget {
   const LoginRegistrationScreen({Key? key}) : super(key: key);
@@ -8,15 +9,15 @@ class LoginRegistrationScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text('Login/Register'),
+        title: const Text('Login/Register'),
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -27,30 +28,30 @@ class LoginRegistrationScreen extends StatelessWidget {
               height: 120.0,
               width: 120.0,
             ),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             // Title
-            Text(
+            const Text(
               'Welcome to Wanderlust',
               style: TextStyle(
                 fontSize: 24.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 24.0),
+            const SizedBox(height: 24.0),
             // Login Form
-            TextField(
+            const TextField(
               decoration: InputDecoration(
                 labelText: 'Email/Username',
               ),
             ),
-            SizedBox(height: 12.0),
-            TextField(
+            const SizedBox(height: 12.0),
+            const TextField(
               obscureText: true,
               decoration: InputDecoration(
                 labelText: 'Password',
               ),
             ),
-            SizedBox(height: 12.0),
+            const SizedBox(height: 12.0),
             TextButton(
               onPressed: () {
                 // Forgot password action

@@ -1,159 +1,125 @@
 import 'package:flutter/material.dart';
-import 'package:wanderlust/screens/search_results_screen.dart';
-import 'package:wanderlust/screens/destination_details_screen.dart';
-import 'package:wanderlust/screens/travel_planner_screen.dart';
-import 'package:wanderlust/screens/my_trips_screen.dart';
-import 'package:wanderlust/screens/profile_screen.dart';
-import 'package:wanderlust/screens/login_screen.dart';
-import 'package:wanderlust/screens/recommendations_screen.dart';
-import 'package:wanderlust/screens/settings_screen.dart';
-import 'package:wanderlust/screens/about_screen.dart';
+import 'package:intl/intl.dart';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class TravelPlannerScreen extends StatefulWidget {
+  const TravelPlannerScreen({Key? key}) : super(key: key);
+
+  @override
+  _TravelPlannerScreenState createState() => _TravelPlannerScreenState();
+}
+
+class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
+  final TextEditingController _destinationController = TextEditingController();
+  DateTime _startDate = DateTime.now();
+  DateTime _endDate = DateTime.now().add(Duration(days: 7));
+  final TextEditingController _notesController = TextEditingController();
+
+  // Method to open a date picker for selecting the start date
+  Future<void> _selectStartDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _startDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null && pickedDate != _startDate) {
+      setState(() {
+        _startDate = pickedDate;
+      });
+    }
+  }
+
+  // Method to open a date picker for selecting the end date
+  Future<void> _selectEndDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _endDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null && pickedDate != _endDate) {
+      setState(() {
+        _endDate = pickedDate;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-        title: Text('Wanderlust'),
-    actions: [
-    IconButton(
-    icon: Icon(Icons.search),
-    onPressed: () {
-    // Navigator.push(
-    // context,
-    // MaterialPageRoute(builder: (context) => SearchScreen()),
-    // );
-    },
-    ),
-    IconButton(
-    icon: Icon(Icons.person),
-    onPressed: () {
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => LoginRegistrationScreen()),
-    );
-    },
-    ),
-    ],
-    ),
-    body: Center(
-    child: Column(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-    Text('Welcome to Wanderlust!'),
-    ElevatedButton(
-    onPressed: () {
-    // Navigator.push(
-    // context,
-    // MaterialPageRoute(builder: (context) => TravelPlannerScreen()),
-    // );
-    },
-    child: Text('Go to Travel Planner'),
-    ),
-    ],
-    ),
-    ),
-    floatingActionButton: FloatingActionButton(
-    onPressed: () {
-    // Add animation for the floating action button here
-    showDialog(
-    context: context,
-    builder: (BuildContext context) {
-    return AlertDialog(
-    title: Text('Add New Trip'),
-    content: Text('This feature is coming soon!'),
-    actions: [
-    TextButton(
-    onPressed: () {
-    Navigator.of(context).pop();
-    },
-    child: Text('OK'),
-    ),
-    ],
-    );
-    },
-    );
-    },
-    child: Icon(Icons.add),
-    ),
-    drawer: Drawer(
-    child: ListView(
-    padding: EdgeInsets.zero,
-    children: <Widget>[
-    DrawerHeader(
-    decoration: BoxDecoration(
-    color: Colors.blueGrey,
-    ),
-    child: Text(
-    'Wanderlust',
-    style: TextStyle(
-    color: Colors.white,
-    fontSize: 24,
-    ),
-    ),
-    ),
-    ListTile(
-    leading: Icon(Icons.home),
-    title: Text('Home'),
-    onTap: () {
-    Navigator.pop(context);
-    },
-    ),
-    ListTile(
-    leading: Icon(Icons.info),
-    title: Text('About'),
-    onTap: () {
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => AboutScreen()),
-    );
-    },
-    ),
-    ListTile(
-    leading: Icon(Icons.card_travel),
-    title: Text('My Trips'),
-    onTap: () {
-    // Navigator.push(
-    // context,
-    // MaterialPageRoute(builder: (context) => MyTripsScreen()),
-    // );
-    },
-    ),
-    ListTile(
-    leading: Icon(Icons.person),
-    title: Text('Profile'),
-    onTap: () {
-    // Navigator.push(
-    // context,
-    // MaterialPageRoute(builder: (context) => ProfileScreen()),
-    // );
-    },
-    ),
-    ListTile(
-    leading: Icon(Icons.settings),
-    title: Text('Settings'),
-    onTap: () {
-    Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => SettingsScreen()),
-    );
-    },
-    ),
-    ListTile(
-    leading: Icon(Icons.logout),
-    title: Text('Logout'),
-    onTap: () {
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => LoginScreen()),
-    // );
-    },
-    ),
-    ],
-    ),
-    ),
+      appBar: AppBar(
+        title: const Text('Travel Planner'),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _destinationController,
+                decoration: InputDecoration(
+                  labelText: 'Destination',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _selectStartDate(context),
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'Start Date',
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Text(
+                          DateFormat('MM/dd/yyyy').format(_startDate),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16.0),
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _selectEndDate(context),
+                      child: InputDecorator(
+                        decoration: InputDecoration(
+                          labelText: 'End Date',
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Text(
+                          DateFormat('MM/dd/yyyy').format(_endDate),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _notesController,
+                decoration: InputDecoration(
+                  labelText: 'Notes',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: null,
+              ),
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: Add trip to database or storage
+                  Navigator.pop(context);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
