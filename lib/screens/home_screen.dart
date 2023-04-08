@@ -22,8 +22,8 @@ class HomeScreen extends StatelessWidget {
             icon: Icon(Icons.search),
             onPressed: () {
               Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => SearchResultsScreen()),
+                context,
+                MaterialPageRoute(builder: (context) => SearchResultsScreen()),
               );
             },
           ),
@@ -46,8 +46,8 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TravelPlannerScreen()),
+                  context,
+                  MaterialPageRoute(builder: (context) => TravelPlannerScreen()),
                 );
               },
               child: Text('Go to Travel Planner'),
@@ -126,8 +126,8 @@ class HomeScreen extends StatelessWidget {
               title: Text('Profile'),
               onTap: () {
                 Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
                 );
               },
             ),

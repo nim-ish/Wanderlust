@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wanderlust/places_data.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TravelPlannerScreen extends StatefulWidget {
   const TravelPlannerScreen({Key? key}) : super(key: key);
@@ -9,151 +10,153 @@ class TravelPlannerScreen extends StatefulWidget {
 }
 
 class _TravelPlannerScreenState extends State<TravelPlannerScreen> {
-  Place? _selectedPlace;
+  late TextEditingController _destinationController;
   DateTime? _startDate;
   DateTime? _endDate;
-  String _notes = '';
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _destinationController = TextEditingController();
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _destinationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _destinationController.text = prefs.getString('destination') ?? '';
+      final startDateMillis = prefs.getInt('start_date');
+      if (startDateMillis != null) {
+        _startDate = DateTime.fromMillisecondsSinceEpoch(startDateMillis);
+      }
+      final endDateMillis = prefs.getInt('end_date');
+      if (endDateMillis != null) {
+        _endDate = DateTime.fromMillisecondsSinceEpoch(endDateMillis);
+      }
+    }
+    );
+  }
+
+  // Future<void> _saveData() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('destination', _destinationController.text);
+  //   await prefs.setInt('start_date', _startDate?.millisecondsSinceEpoch ?? 0);
+  //   await prefs.setInt('end_date', _endDate?.millisecondsSinceEpoch ?? 0);
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Planner'),
+          title: const Text('Travel Planner'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: () async {
+                setState(() {
+                  _isSaving = true;
+                });
+                await _saveData();
+                setState(() {
+                  _isSaving = false;
+                });
+              },
+            )
+          ],
         ),
         body: Padding(
-        padding: const EdgeInsets.all(16.0),
-    child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-    Text(
-    'Where do you want to go?',
-    style: Theme.of(context).textTheme.headline6,
-    ),
-    SizedBox(height: 16.0),
-    DropdownButtonFormField<Place>(
-    decoration: InputDecoration(
-    labelText: 'Destination',
-    ),
-    value: _selectedPlace,
-    items: places
-        .map(
-    (place) => DropdownMenuItem(
-    value: place,
-    child: Text(place.name),
-    ),
-    )
-        .toList(),
-    onChanged: (newValue) {
-    setState(() {
-    _selectedPlace = newValue;
-    });
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+            TextField(
+            controller: _destinationController,
+            decoration: const InputDecoration(
+              labelText: 'Destination',
+            ),
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _startDate == null
+                    ? 'Start Date'
+                    : '${DateFormat.yMMMd().format(_startDate!)}',
+                style: Theme.of(context).textTheme.bodyText2,
+              ),
+              IconButton(
+                icon: const Icon(Icons.calendar_today),
+                onPressed: () async {
+                  final selectedDate = await showDatePicker(
+                    context: context,
+                    initialDate: _startDate ?? DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (selectedDate != null) {
+                    setState(() {
+                      _startDate = selectedDate;
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16.0),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+          Text(
+          _endDate == null
+          ? 'End Date'
+              : '${DateFormat.yMMMd().format(_endDate!)}',
+          style: Theme.of(context).textTheme.bodyText2,
+        ),
+        IconButton(
+        icon: const Icon(Icons.calendar_today),
+    onPressed: () async {
+    final selectedDate = await showDatePicker(
+    context: context,
+    initialDate: _endDate ?? DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (selectedDate != null) {
+      setState(() {
+        _endDate = selectedDate;
+      });
+      await _saveData();
+    }
     },
-    ),
-    SizedBox(height: 16.0),
-    Text(
-    _selectedPlace?.name ?? 'No destination selected',
-    style: Theme.of(context).textTheme.headline6,
-    ),
-    SizedBox(height: 16.0),
-    Text(
-    'When do you want to go?',
-    style: Theme.of(context).textTheme.headline6,
-    ),
-    SizedBox(height: 16.0),
-    Row(
-    children: [
-    Expanded(
-    child: GestureDetector(
-    onTap: () {
-    _selectDate(context, true); // true for start date
-    },
-    child: Container(
-    decoration: BoxDecoration(
-    border: Border.all(
-    color: Colors.grey,
-    ),
-    borderRadius: BorderRadius.circular(4.0),
-    ),
-    padding: EdgeInsets.symmetric(
-    horizontal: 16.0, vertical: 8.0),
-    child: Row(
-    mainAxisAlignment:
-    MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    _startDate == null
-    ? 'Start Date'
-        : '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}',
-    style: Theme.of(context).textTheme.bodyText2,
-    ),
-    Icon(Icons.calendar_today),
-    ],
-    ),
-    ),
-    ),
-    ),
-    SizedBox(width: 16.0),
-    Expanded(
-    child: GestureDetector(
-    onTap: () {
-    _selectDate(context, false); // false for end date
-    },
-    child: Container(
-    decoration: BoxDecoration(
-    border: Border.all(
-    color: Colors.grey,
-    ),
-    borderRadius: BorderRadius.circular(4.0),
-    ),
-    padding: EdgeInsets.symmetric(
-    horizontal: 16.0, vertical: 8.0),
-    child: Row(
-    mainAxisAlignment:
-    MainAxisAlignment.spaceBetween,
-    children: [
-    Text(
-    _endDate == null
-    ? 'End Date'
-        : '${_endDate!.day}/${_endDate!.month}/${_endDate!.year}',
-    style: Theme.of(context).textTheme.bodyText2,
-    ),
-    Icon(Icons.calendar_today),
-    ],
-    ),
-    ),
-    ),
-    ),
-    ],
-    ),
-    SizedBox(height: 16.0),
-    TextField(
-    decoration: InputDecoration(
-    labelText: 'Notes',
-    border: OutlineInputBorder(),
-    ),
-    ),
-    ],
-    ),
+        ),
+              ],
+          ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  await _saveData();
+                  Navigator.of(context).pushNamed('/itinerary');
+                },
+                child: const Text('Create Itinerary'),
+              ),
+            ],
+          ),
         ),
     );
   }
 
-  _selectDate(BuildContext context, bool isStartDate) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: isStartDate ? _startDate ?? DateTime.now() : _endDate ??
-          DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isStartDate) {
-          _startDate = picked;
-        } else {
-          _endDate = picked;
-        }
-      });
-    }
+  Future<void> _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('destination', _destinationController.text);
+    await prefs.setString('start_date', _startDate?.toIso8601String() ?? '');
+    await prefs.setString('end_date', _endDate?.toIso8601String() ?? '');
   }
 }
