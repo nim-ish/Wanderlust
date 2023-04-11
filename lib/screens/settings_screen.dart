@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wanderlust/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:app_settings/app_settings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -9,7 +12,33 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool isDarkMode = false;
+  bool isLocationEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+    _checkLocationEnabled();
+  }
+
+  void _loadSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      isLocationEnabled = prefs.getBool('isLocationEnabled') ?? false;
+    });
+  }
+
+  void _saveSettings() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLocationEnabled', isLocationEnabled);
+  }
+
+  void _checkLocationEnabled() async {
+    bool isEnabled = await Geolocator.isLocationServiceEnabled();
+    setState(() {
+      isLocationEnabled = isEnabled;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,32 +52,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: kDefaultPadding),
-            Text(
-              'Appearance',
-              style: Theme.of(context).textTheme.headline6,
+            const Text(
+              'Location Settings',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SwitchListTile(
-              title: const Text('Dark Mode'),
-              value: isDarkMode,
-              onChanged: (value) {
-                setState(() {
-                  isDarkMode = value;
-                  final Brightness newBrightness =
-                  isDarkMode ? Brightness.dark : Brightness.light;
-                  final ThemeData newTheme =
-                  ThemeData.from(colorScheme: ThemeData().colorScheme.copyWith(brightness: newBrightness));
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Theme(
-                        data: newTheme,
-                        child: const SettingsScreen(),
-                      ),
-                    ),
-                  );
-                });
-              },
+            const SizedBox(height: kDefaultPadding),
+            Visibility(
+              visible: !isLocationEnabled,
+              child: ElevatedButton(
+                onPressed: () {
+                  AppSettings.openLocationSettings();
+                },
+                child: const Text('Enable Location'),
+              ),
+            ),
+            const SizedBox(height: kDefaultPadding),
+            Text(
+              'Location is ${isLocationEnabled ? 'enabled' : 'disabled'}.',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
